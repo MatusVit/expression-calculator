@@ -7,11 +7,30 @@ function expressionCalculator(expr) {
     // write your solution here
     let result = expr.replace(/\s/g, '');
 
-    let regexSum = /(-?\d+(\.\d+)?)\+(-?\d+(\.\d+)?)/;
-    let regexSubtract = /\d+(\.\d+)?-\d+(\.\d+)?/;
-    let regexMultiply = /\d+(\.\d+)?\*\d+(\.\d+)?/;
-    let regexDivide = /\d+(\.\d+)?\/\d+(\.\d+)?/;
+    // let regexSum = /(-?\d+(\.\d+)?)\+(-?\d+(\.\d+)?)/;
+    // let regexSubtract = /\d+(\.\d+)?-\d+(\.\d+)?/;
+    // let regexMultiply = /\d+(\.\d+)?\*\d+(\.\d+)?/;
+    let regexMultiply = /\d+(\.\d+)?\*-?\d+(\.\d+)?/;
+    // let regexDivide = /\d+(\.\d+)?\/\d+(\.\d+)?/;
+    let regexDivide = /\d+(\.\d+)?\/-?\d+(\.\d+)?/;
     
+    
+    if (result.includes('(') || result.includes(')')){
+        if ((result.split('(').length - 1) !==  (result.split(')').length - 1)){
+            throw Error ("ExpressionError: Brackets must be paired");
+        } 
+        
+        let regexBrackets = /\(-?\d+[^\(\)]*\d\)/;
+        while (regexBrackets.test(result)) {
+            let match = result.match(regexBrackets);
+            let str = match[0].slice(1, -1);
+            result = result.replace(regexBrackets, expressionCalculator(str));
+        }
+
+
+    }
+
+
     while (regexDivide.test(result)) {
         let match = result.match(regexDivide);
         result = result.replace(regexDivide, divide(match[0]));
@@ -22,34 +41,18 @@ function expressionCalculator(expr) {
         result = result.replace(regexMultiply, multiply(match[0]));
     }
 
-    
-    while (regexSubtract.test(result)) {
-        let match = result.match(regexSubtract);
-        //TODO change '-' to '+-' and sum
-        result = result.replace(regexSubtract, subtract(match[0]));
+    if (result.includes('+') || result.includes('-')) {
+        result = result.replace(/--/g, '+');
+        result = result.replace(/-/g, '+-');
+        result = result.replace(/^\+-/,  '-');
+        let arr = result.split('+');
+        result = arr.reduce((acc, item) => +acc + +item);
     }
+
+
+    return +result;
+}
     
-    while (regexSum.test(result)) {
-        let match = result.match(regexSum);
-        result = result.replace(regexSum, sum(match[0]));
-    }
-    
-    let number = +result;
-    return number;
-}
-
-
-
-function sum(str) {
-    let arr = str.split('+');
-    let sum = +arr[0] + +arr[1];
-    return sum;
-}
-
-function subtract(str) {
-    let arr = str.split('-');
-    return +arr[0] - +arr[1];
-}
 
 function multiply(str) {
     let arr = str.split('*');
@@ -62,13 +65,11 @@ function divide(str) {
     return +arr[0] / +arr[1];
 }
 
-module.exports = {
-    expressionCalculator
-}
+module.exports = {expressionCalculator}
 
 
 // !test
 
-// let ex = " 64 + 19 - 77 - 93 "
+// let ex = " 93 * 30 / 81 * (  78 * 83 / (  71 * 13 - (  14 + 13 - 28 * 62  ) * 62  ) + 99 - (  80 - 89 + 17 * 42  )  ) "
 // console.log("Начало")
 // console.log(expressionCalculator(ex));
