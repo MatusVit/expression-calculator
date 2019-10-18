@@ -7,11 +7,7 @@ function expressionCalculator(expr) {
     // write your solution here
     let result = expr.replace(/\s/g, '');
 
-    // let regexSum = /(-?\d+(\.\d+)?)\+(-?\d+(\.\d+)?)/;
-    // let regexSubtract = /\d+(\.\d+)?-\d+(\.\d+)?/;
-    // let regexMultiply = /\d+(\.\d+)?\*\d+(\.\d+)?/;
     let regexMultiply = /\d+(\.\d+)?\*-?\d+(\.\d+)?/;
-    // let regexDivide = /\d+(\.\d+)?\/\d+(\.\d+)?/;
     let regexDivide = /\d+(\.\d+)?\/-?\d+(\.\d+)?/;
     
     
@@ -26,8 +22,6 @@ function expressionCalculator(expr) {
             let str = match[0].slice(1, -1);
             result = result.replace(regexBrackets, expressionCalculator(str));
         }
-
-
     }
 
 
@@ -62,14 +56,9 @@ function multiply(str) {
 function divide(str) {
     let arr = str.split('/');
     if (+arr[1] === 0) throw Error("TypeError: Division by zero.");
-    return +arr[0] / +arr[1];
+    return (+arr[0] / +arr[1]).toFixed(16);
 }
 
 module.exports = {expressionCalculator}
 
 
-// !test
-
-// let ex = " 93 * 30 / 81 * (  78 * 83 / (  71 * 13 - (  14 + 13 - 28 * 62  ) * 62  ) + 99 - (  80 - 89 + 17 * 42  )  ) "
-// console.log("Начало")
-// console.log(expressionCalculator(ex));
